@@ -1,0 +1,15 @@
+info:
+  name: view livres
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: http://192.168.100.10:5001/api/v1/livres
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

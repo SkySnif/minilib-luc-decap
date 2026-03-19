@@ -102,8 +102,7 @@ const create = (data) => {
 const update = (id, data) => {
     const idx = livres.findIndex(l => l.id === Number(id));
     if (idx === -1) return null;
-    // Spread : on garde les données existantes et on écrase avec les
-    nouvelles
+    // Spread : on garde les données existantes et on écrase avec les nouvelles
     livres[idx] = { ...livres[idx], ...data }; return livres[idx];
 };
 

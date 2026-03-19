@@ -1,0 +1,39 @@
+info:
+  name: create new bool
+  type: http
+  seq: 7
+
+http:
+  method: POST
+  url: http://192.168.100.10:5001/api/v1/livres
+  body:
+    type: json
+    data: |-
+      {
+      "isbn": "9780596517748",
+      "titre": "JavaScript: The Good Parts",
+      "auteur": "Douglas Crockford",
+      "annee": 2008,
+      "genre": "Informatique"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("should return 201", function () {
+          expect(res.getStatus()).to.equal(201 );
+        });
+             
+        test("should return livre 99 not found", function () {
+          const body = res.getBody();
+          
+          expect(body).to.have.property("id");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

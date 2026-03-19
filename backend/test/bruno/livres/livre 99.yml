@@ -1,0 +1,33 @@
+info:
+  name: livre 99
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: http://192.168.100.10:5001/api/v1/livres/99
+  body:
+    type: json
+    data: ""
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("should return 404", function () {
+          expect(res.getStatus()).to.equal(404 );
+        });
+             
+
+        test("should return livre 99 not found", function () {
+          const body = res.getBody();
+          
+          expect(body.erreur).to.equal("Livre id:99 non trouvé");
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

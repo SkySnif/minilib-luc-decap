@@ -32,8 +32,7 @@ const getLivreById = (req, res) => {
     if (!livre) {
         // 404 Not Found — ressource inexistante
         return res.status(404).json({
-            erreur: `Livre id:${req.params.id} non
-trouvé` });
+            erreur: `Livre id:${req.params.id} non trouvé` });
     }
     res.json(livre);
 };

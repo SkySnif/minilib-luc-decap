@@ -1,0 +1,41 @@
+info:
+  name: new livre sans titre
+  type: http
+  seq: 8
+
+http:
+  method: POST
+  url: http://192.168.100.10:5001/api/v1/livres
+  body:
+    type: json
+    data: |-
+      {
+      "isbn": "9780596517748",
+      "auteur": "Douglas Crockford",
+      "annee": 2008,
+      "genre": "Informatique"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: tests
+      code: |-
+        test("should return 400", function () {
+          expect(res.getStatus()).to.equal(400);
+        });
+             
+        test("sould return champs manquants", function () {
+          const body = res.getBody();
+
+          expect(body.erreur).to.equal("Champs obligatoires manquants");
+          expect(body.champs).to.include("titre")
+          expect(body.champs[0]).to.equal("titre");
+          
+        });
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
