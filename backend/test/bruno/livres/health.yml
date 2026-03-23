@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://192.168.100.10:5001/health
+  url: http://{{BRUNO_TEST_URL}}:{{BRUNO_TEST_PORT}}/health
   auth: inherit
 
 settings:
