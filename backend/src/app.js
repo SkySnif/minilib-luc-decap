@@ -15,49 +15,66 @@ const PORT = process.env.PORT || 5000;
 
 // ── Middlewares globaux ───────────────────────────────────────────────
 // cors() : autorise les requêtes cross-origin (React sur port 3000 → APIsur 5000)
-app.use(cors());
+app.use( cors());
 
 // express.json() : parse automatiquement le body JSON des requêtes POST / PUT
-app.use(express.json());
+app.use( express.json());
 
 // Middleware de logging minimaliste — affiche chaque requête reçue
-app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-    next(); // next() = passer au middleware/route suivant
-});
-
+app.use( ( req, res, next) => 
+    {
+        console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+        next(); // next() = passer au middleware/route suivant
+    }
+);
 
 // ── Routes ───────────────────────────────────────────────────────────
 // Toutes les routes de livres seront préfixées par /api/v1/livres
-app.use('/api/v1/livres', livresRouter);
+app.use( '/api/v1/livres', livresRouter);
 
 // Route de santé — permet de vérifier que le serveur tourne
-app.get('/health', (req, res) => {
-    res.json({
-        status: 'OK',
-        message: 'Serveur MiniLib opérationnel',
-        timestamp: new Date().toISOString(),
-    });
-});
+app.get( '/health', ( req, res) => 
+    {
+        res.json(
+            {
+                status: 'OK',
+                message: ' MiniLib Server up',
+                timestamp: new Date().toISOString(),
+            }
+        );
+    }
+);
 
 // Middleware de gestion des routes inconnues (404)
-app.use((req, res) => {
-    res.status(404).json({
-        erreur: `Route ${req.method} ${req.url} non trouvée`,
-    });
-});
+app.use( ( req, res) => 
+    {
+        res.status(404).json(
+            {
+                erreur: `Route ${req.method} ${req.url} non trouvée`,
+            }
+        );
+    }
+);
 
 // Middleware de gestion des erreurs serveur (500)
 // Express reconnaît ce middleware à ses 4 paramètres (err en premier)
-app.use((err, req, res, next) => {
-    console.error('Erreur serveur:', err.message);
-    res.status(500).json({ erreur: 'Erreur interne du serveur' });
-});
+app.use( ( err, req, res, next) => 
+    {
+        console.error( 'Server error:', err.message);
+        res.status(500).json(
+            {
+                erreur: 'Server internal error' 
+            }
+        );
+    }
+);
 
 // ── Démarrage ─────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-    console.log(`Serveur MiniLib démarré sur http://localhost:${PORT}`);
-    console.log(`Environnement : ${process.env.NODE_ENV}`);
-});
+app.listen( PORT, () => 
+    {
+        console.log(`MiniLib server started on http://localhost:${PORT}`);
+        console.log(`Environment : ${process.env.NODE_ENV}`);
+    }
+);
 
 export default app; // export pour les tests futurs

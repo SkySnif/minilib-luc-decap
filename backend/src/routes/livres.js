@@ -4,22 +4,22 @@
 import express from 'express';
 const router = express.Router();
 
+import asyncWrapper from '../middleware/asyncWrapper.js';
 import * as controller from '../controllers/livresController.js';
 
-
 // GET /api/v1/livres → liste tous les livres (+ filtres query params)
-router.get('/', controller.getLivres);
+router.get( '/', asyncWrapper( controller.getLivres));
 
 // GET /api/v1/livres/:id → détail d'un livre
-router.get('/:id', controller.getLivreById);
+router.get( '/:id', asyncWrapper( controller.getLivreById));
 
 // POST /api/v1/livres → créer un nouveau livre
-router.post('/', controller.createLivre);
+router.post( '/', asyncWrapper( controller.createLivre));
 
 // PUT /api/v1/livres/:id → modifier un livre
-router.put('/:id', controller.updateLivre);
+router.put( '/:id', asyncWrapper( controller.updateLivre));
 
 // DELETE /api/v1/livres/:id → supprimer un livre
-router.delete('/:id', controller.deleteLivre);
+router.delete( '/:id', asyncWrapper( controller.deleteLivre));
 
 export default router;
