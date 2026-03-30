@@ -23,11 +23,15 @@ export const getLivres = async( req, res) =>
             }
         );
 
-        res.json(livres);
+        res.json( livres);
     }
     catch (error) 
     {
-        res.status(500).json({ erreur: 'Erreur lors de la récupération des livres' });
+        res.status(500).json(
+            { 
+                erreur: 'Erreur lors de la récupération des livres' 
+            }
+        );
     }
 };
 
@@ -62,13 +66,13 @@ export const getLivreById = async( req, res) =>
 * @param {import('express').Request} req
 * @param {import('express').Response} res
 */
-export const createLivre = async (req, res) => 
+export const createLivre = async ( req, res) => 
 {
     const { isbn, titre, auteur, annee, genre } = req.body;
 
     const manquants = ['isbn','titre','auteur'].filter( k => !req.body[k]);
 
-    if (manquants.length > 0)
+    if ( manquants.length > 0)
     {
         return res.status(400).json(
             { 
@@ -103,7 +107,7 @@ export const updateLivre = async ( req, res) =>
 {
     const misAJour = await livresModel.update( req.params.id, req.body);
 
-    if (!misAJour) 
+    if ( !misAJour) 
     {
         return res.status(404).json(
             {
@@ -112,7 +116,7 @@ export const updateLivre = async ( req, res) =>
         );
     }
 
-    res.json(misAJour);
+    res.json( misAJour);
 };
 
 /**
@@ -122,11 +126,11 @@ export const updateLivre = async ( req, res) =>
 * @param {import('express').Request} req
 * @param {import('express').Response} res
 */
-export const deleteLivre = async (req, res) => 
+export const deleteLivre = async ( req, res) => 
 {
-    const supprimé = await livresModel.remove(req.params.id);
+    const supprimé = await livresModel.remove( req.params.id);
 
-    if (!supprimé) 
+    if ( !supprimé) 
     {
         return res.status(404).json(
             {

@@ -1,15 +1,16 @@
 // ─── backend/src/app.js ─────────────────────────────────────────────
-// Point d'entrée du serveur Express MiniLib
-// Démarre avec : npm run dev
+// Entry Point of MiniLib Express server
+// Start with : npm run dev
 
 import express from 'express';
 import cors from 'cors';
 // Node 24 : plus besoin de dotenv // charge les variables depuis .env
 
-// Import des routeurs (on les créera juste après)
+// Router Import
 import livresRouter from './routes/livres.js';
+import adherentsRouter from './routes/adherents.js';
 
-// ── Initialisation de l'application Express ──────────────────────────
+// ── Initialisation of Express' application  ──────────────────────────
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -29,28 +30,34 @@ app.use( ( req, res, next) =>
 );
 
 // ── Routes ───────────────────────────────────────────────────────────
-// Toutes les routes de livres seront préfixées par /api/v1/livres
+// All livres's route are prefixe by  /api/v1/livres
 app.use( '/api/v1/livres', livresRouter);
 
-// Route de santé — permet de vérifier que le serveur tourne
+// All adherents' route are prefixe by  /api/v1/adherents
+app.use( '/api/v1/adherents', adherentsRouter);
+
+// All emprunt's route are prefixe by  /api/v1/emprunt
+// app.use( '/api/v1/emprunts', empruntsRouter);
+
+// health route — Check if server is running
 app.get( '/health', ( req, res) => 
     {
         res.json(
             {
                 status: 'OK',
-                message: ' MiniLib Server up',
+                message: 'MiniLib Server up',
                 timestamp: new Date().toISOString(),
             }
         );
     }
 );
 
-// Middleware de gestion des routes inconnues (404)
+// Middleware to manage unknow route (404)
 app.use( ( req, res) => 
     {
         res.status(404).json(
             {
-                erreur: `Route ${req.method} ${req.url} non trouvée`,
+                erreur: `Route ${req.method} ${req.url} not find`,
             }
         );
     }
@@ -69,7 +76,7 @@ app.use( ( err, req, res, next) =>
     }
 );
 
-// ── Démarrage ─────────────────────────────────────────────────────────
+// ── Start ─────────────────────────────────────────────────────────
 app.listen( PORT, () => 
     {
         console.log(`MiniLib server started on http://localhost:${PORT}`);
