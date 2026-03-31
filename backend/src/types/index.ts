@@ -5,3 +5,4 @@
 export * from './livre.js';
 export * from './adherent.js';
 export * from './emprunt.js';
+export * from './queryResult.js';

@@ -4,14 +4,12 @@
 * Chargé via Node 24 : node --env-file=.env src/app.js
 * @module database
 */
-import pg from 'pg';
+import { Pool } from 'pg';
 
-const { Pool } = pg;
-
-const pool = new Pool(
+const pool: Pool = new Pool(
     {
         host: process.env.DB_HOST || 'localhost',
-        port: parseInt(process.env.DB_PORT) || 5432,
+        port: Number(process.env.DB_PORT || 5432),
         database: process.env.DB_NAME || 'minilib',
         user: process.env.DB_USER || 'minilib_user',
         password: process.env.DB_PASSWORD,
@@ -21,6 +19,6 @@ const pool = new Pool(
 );
 
 pool.on('connect', () => console.log( '[DB] Pool PostgreSQL connecté'));
-pool.on('error', (err) => console.error( '[DB] Erreur pool:', err.message));
+pool.on('error', (err: Error) => console.error( '[DB] Erreur pool:', err.message,  err.stack));
 
 export default pool;

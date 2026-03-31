@@ -1,0 +1,135 @@
+// backend/src/models/livresModel.js
+
+/**
+* Accès aux données livres via PostgreSQL.
+* Remplace l'ancien livresData.js en mémoire.
+* Toutes les fonctions sont async — elles retournent des Promises.
+*
+* @module livresModel
+*/
+
+import pool from '../config/database.js';
+import { QueryResult } from '../types/queryResult.js';
+
+import { Livre, CreateLivreDto, FiltresLivre } from '../types/index.js'
+
+/**
+* Récupère tous les livres avec filtres optionnels.
+*
+* @async
+* @param {FiltresLivre} [filtres={}]
+* @returns {Promise<Livre[]>}
+*/
+export const findAll = async ( filtres: FiltresLivre = {}) : Promise<Livre[]> => 
+{
+    const conditions: string[] = [];
+    const valeurs: string[] = [];
+    let idx:number = 1;
+
+    if ( filtres.genre !== undefined) 
+    {
+        conditions.push( `genre = $${idx++}`);
+        valeurs.push( filtres.genre);
+    }
+
+    if ( filtres.disponible !== undefined) 
+    {
+        conditions.push( `disponible = $${idx++}`);
+        valeurs.push( String( filtres.disponible));
+    }
+
+    if ( filtres.recherche) 
+    {
+        conditions.push( `(titre ILIKE $${idx} OR auteur ILIKE $${idx})`);
+        valeurs.push( `%${filtres.recherche}%`);
+        idx++;
+    }
+
+    const where: string = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+    
+    const result: QueryResult<Livre> = await pool.query<Livre>(
+        `SELECT * FROM livres ${where} ORDER BY titre`,
+        valeurs
+    )
+
+    return result.rows;
+};
+
+/**
+* Trouve un livre par son id.
+* @async
+* @param {number} id
+* @returns {Promise<Livre|null>} Livre ou null
+*/
+export const findById = async (id: number) : Promise<Livre|null> => 
+{
+    const result: QueryResult<Livre> = await pool.query<Livre>(
+        'SELECT * FROM livres WHERE id = $1', 
+        [id]);
+
+    return result.rows[0] || null;
+};
+
+/**
+* Crée un nouveau livre.
+* @async
+* @param {CreateLivreDto} data
+* @returns {Promise<Livre>} Le livre créé avec son id
+*/
+export const create = async ( data: CreateLivreDto): Promise<Livre> => 
+{
+    const { isbn, titre, auteur, annee, genre } = data;
+
+    const result: QueryResult<Livre> = await pool.query<Livre>( 
+        `INSERT INTO livres (isbn, titre, auteur, annee, genre) VALUES ($1, $2, $3, $4, $5) 
+            RETURNING *`,
+        [isbn, titre, auteur, annee, genre] // RETURNING * retourne la ligne insérée — y compris l'id généré par SERIAL
+    );
+
+    return result.rows[0];
+};
+
+/**
+* Met à jour un livre.
+* @async
+* @param {number} id
+* @param {Livre} data - Champs à modifier
+* @returns {Promise<Livre|null>} Livre mis à jour ou null
+*/
+export const update = async ( 
+    id: number, 
+    data:Partial<Livre>): Promise<Livre|null> => 
+{
+    // Construction dynamique du SET
+    const champs: string[] = Object.keys( data);
+    const valeurs: (string | number | boolean)[] = Object.values(data);
+
+    if ( champs.length === 0) 
+        return findById(id);
+
+    const setClause: string = champs.map((c, i) => `${c} = $${i + 1}`).join(', ');
+
+    const result: QueryResult<Livre> = await pool.query<Livre>(
+        `UPDATE livres SET ${setClause} WHERE id = $${champs.length + 1} 
+            RETURNING *`,
+        [...valeurs, id]
+    );
+
+    return result.rows[0] || null;
+};
+
+/**
+* Supprime un livre.
+* @async
+* @param {number} id
+* @returns {Promise<boolean>} true si supprimé
+*/
+export const remove = async (id: number): Promise<boolean> => 
+{
+    const result: QueryResult<Livre> = await pool.query<Livre>(
+        'DELETE FROM livres WHERE id = $1 RETURNING id', 
+        [id]
+    );
+
+    return result.rowCount ? true : false;
+};
