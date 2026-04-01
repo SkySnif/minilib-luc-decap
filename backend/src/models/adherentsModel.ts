@@ -4,7 +4,9 @@
 * @module adherentsModel
 */
 import pool from '../config/database.js';
+import { QueryResult } from '../types/queryResult.js';
 
+import { Adherent, CreateAdherentDto } from '../types/adherent.js';
 
 // ───────────────────────────────────────────────────────────────
 // ──── Private function ─ not exposed to route ───────────────────────
@@ -15,7 +17,7 @@ import pool from '../config/database.js';
 * @async
 * @returns {Promise<string>} Numéro adhérent
 */
-const genererNumeroAdherent = async () => 
+const genererNumeroAdherent = async (): Promise<string> => 
 {
     const result = await pool.query( 'SELECT COUNT(*) FROM adherents');
     const count = parseInt( result.rows[0].count) + 1;
@@ -28,17 +30,19 @@ const genererNumeroAdherent = async () =>
 // ───────────────────────────────────────────────────────────────
 
 /** @async @returns {Promise<Array>} Tous les adhérents actifs */
-export const findAll = async () => 
+export const findAll = async ()  : Promise<Adherent[]> => 
 {
-    const result = await pool.query( 'SELECT * FROM adherents WHERE actif = true ORDER BY nom, prenom');
+    const result: QueryResult<Adherent> = await pool.query<Adherent>( 
+        'SELECT * FROM adherents WHERE actif = true ORDER BY nom, prenom'
+    );
 
     return result.rows;
 };
 
 /** @async @param {number} id @returns {Promise<Object|null>} */
-export const findById = async ( id) => 
+export const findById = async ( id: number) => 
 {
-    const result = await pool.query( 
+    const result: QueryResult<Adherent> = await pool.query<Adherent>( 
         'SELECT * FROM adherents WHERE id = $1', 
         [id]
     );
@@ -52,11 +56,11 @@ export const findById = async ( id) =>
 * @param {Object} data - { nom, prenom, email }
 * @returns {Promise<Object>} Adhérent créé
 */
-export const create = async ({ nom, prenom, email }) => 
+export const create = async (data: CreateAdherentDto): Promise<Adherent> => 
 {
     const numero = await genererNumeroAdherent();
 
-    const result = await pool.query( 
+    const result: QueryResult<Adherent> = await pool.query<Adherent>( 
         `INSERT INTO adherents (numero_adherent, nom, prenom, email) VALUES ($1, $2, $3, $4) 
             RETURNING *`,
         [numero, nom, prenom, email]

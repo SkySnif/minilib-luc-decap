@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 
 import ApiError from "../utils/ApiError.js";
 
-import { Livre, FiltresLivre } from '../types/livre.js';
+import { Livre, FiltresLivre, CreateLivreDto } from '../types/livre.js';
 import * as livresModel from '../models/livresModel.js';
 
 /**
@@ -21,7 +21,7 @@ export const getLivres = async(
 ) : Promise<void> => 
 {
         // req.query contient les paramètres de l'URL (?genre=...&disponible=...)
-        const livres: Livre[] = await livresModel.findAll( req.body);
+        const livres: Livre[] = await livresModel.findAll( req.query);
 
         if (livres.length === 0)
             throw new ApiError(404, "No book find with these criteria")
@@ -61,10 +61,10 @@ export const getLivreById = async(
 * @param {import('express').Response} res
 */
 export const createLivre = async ( 
-    req: Request<{}, Livre, Livre, {}>,
+    req: Request<{}, Livre, CreateLivreDto, {}>,
     res: Response) : Promise<void> => 
 {
-    const champsObligatoires: (keyof Livre)[] = ['isbn', 'titre', 'auteur'];
+    const champsObligatoires: (keyof CreateLivreDto)[] = ['isbn', 'titre', 'auteur'];
     const manquants = champsObligatoires.filter( k => !req.body[k]);
 
     if ( manquants.length > 0)

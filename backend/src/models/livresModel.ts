@@ -78,12 +78,25 @@ export const findById = async (id: number) : Promise<Livre|null> =>
 */
 export const create = async ( data: CreateLivreDto): Promise<Livre> => 
 {
-    const { isbn, titre, auteur, annee, genre } = data;
+
+    // Retrieve the list of the CreateLivreDto's fields 
+    const entries = Object.entries(data).filter(
+        ([, v]) => v !== undefined
+    ) as [keyof CreateLivreDto, string | number | boolean][];
+
+    const champs: (string | number | boolean )[] = entries.map(([k]) => k);
+    const valeurs:(string | number | boolean )[] = entries.map(([, v]) => v);
+
+
+    // Build values string for SQL
+    const SQLqueryvalue: string = champs.map((_, i) => `$${i + 1}`).join(', ');
+    const SQLField: string = champs.join(', ');
 
     const result: QueryResult<Livre> = await pool.query<Livre>( 
-        `INSERT INTO livres (isbn, titre, auteur, annee, genre) VALUES ($1, $2, $3, $4, $5) 
+        `INSERT INTO livres (${SQLField})
+            VALUES (${SQLqueryvalue})
             RETURNING *`,
-        [isbn, titre, auteur, annee, genre] // RETURNING * retourne la ligne insérée — y compris l'id généré par SERIAL
+            valeurs
     );
 
     return result.rows[0];

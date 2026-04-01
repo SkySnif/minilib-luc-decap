@@ -1,9 +1,9 @@
 // backend/src/routes/adherents.js
-import express from 'express';
+import express, { Router } from 'express';
 import asyncWrapper from '../middleware/asyncWrapper.js';
 import * as controller from '../controllers/adherentsController.js';
 
-const router = express.Router();
+const router: Router = express.Router();
 
 router.get( '/', asyncWrapper( controller.getAdherents));
 router.get( '/:id', asyncWrapper( controller.getAdherentById));
