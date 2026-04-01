@@ -7,7 +7,14 @@
 import pool from '../config/database.js';
 import { QueryResult } from '../types/queryResult.js';
 
-import { Emprunt } from '../types/emprunt.js';
+// Manage to converte error code by DB in global error code
+import { mapDBError } from "../utils/errors/db/dbErrorMapper.js";
+
+// Error manager for specific error to catch associated to livres
+import { DuplicateEmpruntsError  } from "../utils/errors/modulesErrors/EmpruntsErrors.js";
+
+// import { Livre, FiltresLivre, CreateLivreDto } from '../types/livre.js';
+import { Emprunt  } from "../validators/empruntShema.js";
 
 // ───────────────────────────────────────────────────────────────
 // ──── Export function ─ exposed to route ───────────────────────
@@ -16,7 +23,7 @@ import { Emprunt } from '../types/emprunt.js';
 /** @async @returns {Promise<Array>} Tous les adhérents actifs */
 export const findAll = async () : Promise<Emprunt[]>=> 
 {
-    const result:QueryResult<Emprunt> = await pool.query( 
+    const result:QueryResult<Emprunt> = await pool.query<Emprunt>( 
         `SELECT 
             * 
         FROM 
@@ -30,4 +37,3 @@ export const findAll = async () : Promise<Emprunt[]>=>
 
     return result.rows;
 };
-

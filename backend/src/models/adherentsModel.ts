@@ -4,9 +4,14 @@
 * @module adherentsModel
 */
 import pool from '../config/database.js';
-import { QueryResult } from '../types/queryResult.js';
+import { QueryResult, CountRow} from '../types/queryResult.js';
+import { mapDBError } from "../utils/errors/db/dbErrorMapper.js";
+import { prepareInsert } from '../utils/helpers/dbhelper.js';
 
-import { Adherent, CreateAdherentDto } from '../types/adherent.js';
+// Error manager for specific error to catch associated to livres
+import { DuplicateAdherentsError } from "../utils/errors/modulesErrors/adherentsErrors.js";
+
+import { Adherent, CreateAdherentDto, createAdherentSchema } from '../validators/adherentSchema.js';
 
 // ───────────────────────────────────────────────────────────────
 // ──── Private function ─ not exposed to route ───────────────────────
@@ -19,7 +24,7 @@ import { Adherent, CreateAdherentDto } from '../types/adherent.js';
 */
 const genererNumeroAdherent = async (): Promise<string> => 
 {
-    const result = await pool.query( 'SELECT COUNT(*) FROM adherents');
+    const result: QueryResult<CountRow> = await pool.query<CountRow>( 'SELECT COUNT(*) FROM adherents');
     const count = parseInt( result.rows[0].count) + 1;
 
     return `ADH-${String(count).padStart(3, '0')}`; // ADH-001, ADH-042...
@@ -69,48 +74,56 @@ export const findById = async ( id: number) =>
 * @param {Object} data - { nom, prenom, email }
 * @returns {Promise<Object>} Adhérent créé
 */
-export const create = async (data: CreateAdherentDto): Promise<Adherent> => 
+export const create = async ( data: CreateAdherentDto): Promise<Adherent> => 
 {
-    const numero: string = await genererNumeroAdherent();
+    try
+    {
+        // Validate DTO aith Zod
+        // Optionnal because it's done in the middleware route but in case if the function is not called from the router/middleware
+        const parsedData: CreateAdherentDto = createAdherentSchema.parse(data);
 
-    // Retrieve the list of the CreateLivreDto's fields 
-    // TODO: Check details of this instruction
-    const entries:[keyof CreateAdherentDto, string | number | boolean][] = Object.entries(data).filter(
-        ([, v]) => v !== undefined
-        ) as [keyof CreateAdherentDto, string | number | boolean][];
+        const numero: string = await genererNumeroAdherent();
 
-    const champs: (string | number | boolean )[] = entries.map(([k]) => k);
-    const valeurs:(string | number | boolean )[] = entries.map(([, v]) => v);
+        // Retrieve the list of the CreateLivreDto's fields 
+        // TODO: Check details of this instruction
+        // On filtre les valeurs undefined
+        // Préparer SQL avec helper
+        const { champs, valeurs, SQLqueryvalue, SQLField } = prepareInsert(parsedData, 
+            {
+                numero_adherent: numero, // Extra data not in the json data / req.body but added in model - genererNumeroAdherent();
+            }
+        );
 
-    // Add numero_adherent in insert at the beginning of champs/valeur tab
-    champs.unshift('numero_adherent');
-    valeurs.unshift( numero);
+        const result: QueryResult<Adherent> = await pool.query<Adherent>( 
+            `INSERT INTO 
+                adherents 
+                    (${SQLField}) 
+            VALUES 
+                (${SQLqueryvalue}) 
+            RETURNING 
+                *`,
+            valeurs
+        );
 
-    // Build values string for SQL
-    const SQLqueryvalue: string = champs.map((_, i) => `$${i + 1}`).join(', ');
-    const SQLField: string = champs.join(', ');
+        return result.rows[0];
+    }
+    catch (err: any) 
+    {
+        const type: string = mapDBError( err);
 
-    const result: QueryResult<Adherent> = await pool.query<Adherent>( 
-        `INSERT INTO 
-            adherents 
-                (${SQLField}) 
-        VALUES 
-            (${SQLField}) 
-        RETURNING 
-            *`,
-        valeurs
-    );
+        if ( type === "unique_violation")
+            throw new DuplicateAdherentsError();
 
-    return result.rows[0];
+        throw err; // autres erreurs DB
+    }
 };
-
 /**
 * Disabled an adherent (soft delete — we are never deleting line in the BDD).
 * @async
 * @param {number} id
 * @returns {Promise<Object|null>} Adhérent mis à jour
 */
-export const desactiver = async (id: number) : Promise<Adherent> => 
+export const desactiver = async ( id: number) : Promise<Adherent> => 
 {
     const result: QueryResult<Adherent> = await pool.query<Adherent>( 
         `UPDATE 

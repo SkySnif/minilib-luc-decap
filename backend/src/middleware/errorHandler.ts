@@ -1,7 +1,7 @@
 // backend/src/middleware/errorHandler.ts
 
 import { Request, Response, NextFunction } from "express";
-import ApiError from "../utils/ApiError.js";
+import { ApiError } from "../utils/errors/ApiError.js";
 
 const errorHandler = (
     err: Error | ApiError,
@@ -22,7 +22,7 @@ const errorHandler = (
     }
 
     // Erreur inconnue
-    console.error("Unexpected error:", err);
+    console.error("Unexpected error:", err.message);
 
     res.status(500).json({
         status: "error",

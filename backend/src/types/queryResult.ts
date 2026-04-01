@@ -5,3 +5,7 @@ export interface QueryResult<T> {
     command?: string;       // optionnel
     [key: string]: any;     // extensible pour d’autres DB
 }
+
+export interface CountRow {
+    count: string;
+}

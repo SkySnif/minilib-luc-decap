@@ -3,6 +3,9 @@
 // Toutes ces routes sont préfixées par /api/v1/livres dans app.js
 import express, { Router } from 'express';
 import asyncWrapper from '../middleware/asyncWrapper.js';
+import validate from '../middleware/validate.js';
+
+import { createLivreSchema } from "../validators/livreSchema.js";
 import * as controller from '../controllers/livresController.js';
 
 const router: Router = express.Router();
@@ -14,7 +17,7 @@ router.get( '/', asyncWrapper( controller.getLivres));
 router.get( '/:id', asyncWrapper( controller.getLivreById));
 
 // POST /api/v1/livres → créer un nouveau livre
-router.post( '/', asyncWrapper( controller.createLivre));
+router.post( '/', validate(createLivreSchema), asyncWrapper( controller.createLivre));
 
 // PUT /api/v1/livres/:id → modifier un livre
 router.put( '/:id', asyncWrapper( controller.updateLivre));

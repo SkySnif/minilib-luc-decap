@@ -1,8 +1,10 @@
 // backend/src/controllers/adherentsController.js
 import { Request, Response } from 'express';
 
-import ApiError from "../utils/ApiError.js";
-import { Adherent, CreateAdherentDto } from '../types/adherent.js';
+import { BadRequestError, NotFoundError } from "../utils/errors/index.js";
+
+//import { Adherent, CreateAdherentDto } from '../types/adherent.js';
+import { Adherent, CreateAdherentDto } from '../validators/adherentSchema.js';
 
 import * as adherentsModel from '../models/adherentsModel.js';
 
@@ -16,7 +18,7 @@ export const getAdherents = async (
 
     // TODO: Add criteria like livres
     if (adherents.length === 0)
-        throw new ApiError(404, "No adherents find with these criteria")
+        throw new NotFoundError( "No adherents find with these criteria")
 
     res.json( adherents);
 };
@@ -28,12 +30,12 @@ export const getAdherentById = async (
 {
    const id: number = Number(req.params.id)
     if (isNaN(id))
-        throw ApiError.badRequest('Id invalide');
+        throw new BadRequestError( 'Id invalide');
 
     const adherent: Adherent = await adherentsModel.findById( id);
 
     if ( !adherent)
-        throw new ApiError(404, 'Adhérent id:${req.params.id} introuvable');
+        throw new NotFoundError(  'Adhérent id:${req.params.id} introuvable');
 
     res.json(adherent);
 };
@@ -47,7 +49,7 @@ export const createAdherent = async (
     const manquants = champsObligatoires.filter( k => !req.body[k]);
 
     if ( manquants.length > 0)
-        throw new ApiError(404, 'Champs manquants', { champs: manquants } );
+        throw new BadRequestError( 'Champs manquants', { champs: manquants } );
 
     const nouveau: Adherent = await adherentsModel.create( req.body);
 
@@ -61,12 +63,12 @@ export const desactiverAdherent = async (
 {
    const id: number = Number(req.params.id)
     if (isNaN(id))
-        throw ApiError.badRequest('Id invalide');
+        throw new NotFoundError( 'Id invalide');
 
     const adherent: Adherent = await adherentsModel.desactiver( id);
 
     if ( !adherent)
-        throw new ApiError(404, 'Adhérent id:${req.params.id} introuvable');
+        throw new BadRequestError(  'Adhérent id:${req.params.id} introuvable');
 
     res.json( adherent);
 };

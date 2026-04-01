@@ -11,7 +11,14 @@
 import pool from '../config/database.js';
 import { QueryResult } from '../types/queryResult.js';
 
-import { Livre, CreateLivreDto, FiltresLivre } from '../types/index.js'
+// Manage to converte error code by DB in global error code
+import { mapDBError } from "../utils/errors/db/dbErrorMapper.js";
+
+// Error manager for specific error to catch associated to livres
+import { DuplicateLivreError  } from "../utils/errors/modulesErrors/livresErrors.js";
+
+// import { Livre, FiltresLivre, CreateLivreDto } from '../types/livre.js';
+import { Livre, FiltresLivre, CreateLivreDto } from "../validators/livreSchema.js";
 
 /**
 * Récupère tous les livres avec filtres optionnels.
@@ -91,30 +98,47 @@ export const findById = async (id: number) : Promise<Livre|null> =>
 */
 export const create = async ( data: CreateLivreDto): Promise<Livre> => 
 {
+    try {
 
-    // Retrieve the list of the CreateLivreDto's fields 
-    const entries:[keyof CreateLivreDto, string | number | boolean][] = Object.entries(data).filter(
-        ([, v]) => v !== undefined
-    ) as [keyof CreateLivreDto, string | number | boolean][];
+        // Retrieve the list of the CreateLivreDto's fields 
+        const entries:[keyof CreateLivreDto, string | number | boolean][] = Object.entries(data).filter(
+            ([, v]) => v !== undefined
+        ) as [keyof CreateLivreDto, string | number | boolean][];
 
-    const champs: (string | number | boolean )[] = entries.map(([k]) => k);
-    const valeurs:(string | number | boolean )[] = entries.map(([, v]) => v);
+        const champs: (string | number | boolean )[] = entries.map(([k]) => k);
+        const valeurs:(string | number | boolean )[] = entries.map(([, v]) => v);
 
-    // Build values string for SQL
-    const SQLqueryvalue: string = champs.map((_, i) => `$${i + 1}`).join(', ');
-    const SQLField: string = champs.join(', ');
+        // Build values string for SQL
+        const SQLqueryvalue: string = champs.map((_, i) => `$${i + 1}`).join(', ');
+        const SQLField: string = champs.join(', ');
 
-    const result: QueryResult<Livre> = await pool.query<Livre>( 
-        `INSERT INTO 
-            livres (${SQLField})
-        VALUES 
-            ( ${SQLqueryvalue} )
-        RETURNING 
-            *`,
-        [valeurs]
-    );
+        console.log(`INSERT INTO 
+                livres (${SQLField})
+            VALUES 
+                (${SQLqueryvalue})
+            RETURNING 
+                *`)
+        const result: QueryResult<Livre> = await pool.query<Livre>( 
+            `INSERT INTO 
+                livres (${SQLField})
+            VALUES 
+                (${SQLqueryvalue})
+            RETURNING 
+                *`,
+            valeurs
+        );
 
-    return result.rows[0];
+        return result.rows[0];
+    }
+    catch (err: any) 
+    {
+        const type: string = mapDBError( err);
+
+        if ( type === "unique_violation")
+            throw new DuplicateLivreError();
+
+        throw err; // autres erreurs DB
+    }
 };
 
 /**
@@ -130,7 +154,7 @@ export const update = async (
 {
     // Construction dynamique du SET
     const champs: string[] = Object.keys( data);
-    const valeurs: (string | number | boolean)[] = Object.values(data);
+    const valeurs: (string | number | boolean | null)[] = Object.values(data);
 
     if ( champs.length === 0) 
         return findById(id);

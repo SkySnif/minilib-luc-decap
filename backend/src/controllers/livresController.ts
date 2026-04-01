@@ -3,9 +3,10 @@
 
 import { Request, Response } from 'express';
 
-import ApiError from "../utils/ApiError.js";
+import { BadRequestError, NotFoundError } from "../utils/errors/index.js";
 
-import { Livre, FiltresLivre, CreateLivreDto } from '../types/livre.js';
+// import { Livre, FiltresLivre, CreateLivreDto } from '../types/livre.js';
+import {  Livre, FiltresLivre, CreateLivreDto } from "../validators/livreSchema.js";
 import * as livresModel from '../models/livresModel.js';
 
 /**
@@ -24,7 +25,7 @@ export const getLivres = async(
         const livres: Livre[] = await livresModel.findAll( req.query);
 
         if (livres.length === 0)
-            throw new ApiError(404, "No book find with these criteria")
+            throw new NotFoundError( "No book find with these criteria")
 
         res.json( livres);
 };
@@ -43,12 +44,12 @@ export const getLivreById = async(
 {
     const id: number = Number(req.params.id)
     if (isNaN(id))
-        throw ApiError.badRequest('Id invalide');
+        throw new BadRequestError('Id invalide');
 
     const livre: Livre|null = await livresModel.findById( id);
 
    if (!livre)
-        throw new ApiError(404, `Livre id:${req.params.id} non trouvé`);
+        throw new NotFoundError( `Livre id:${req.params.id}`);
 
     res.json( livre);
 };
@@ -68,7 +69,7 @@ export const createLivre = async (
     const manquants = champsObligatoires.filter( k => !req.body[k]);
 
     if ( manquants.length > 0)
-        throw ApiError.badRequest("Champs obligatoires manquants", { champs: manquants });
+        throw new BadRequestError("Champs obligatoires manquants", { champs: manquants });
 
     const nouveau: Livre = await livresModel.create(req.body);
 
@@ -84,17 +85,17 @@ export const createLivre = async (
 * @param {import('express').Response} res
 */
 export const updateLivre = async ( 
-    req: Request<{id : string}, Livre,  Partial<Livre>, {}>,
+    req: Request<{id : string}, Livre,  Livre, {}>,
     res: Response) : Promise<void> => 
 {
    const id: number = Number(req.params.id)
     if (isNaN(id))
-        throw ApiError.badRequest('Id invalide');
+        throw new BadRequestError('Id invalide');
     
     const misAJour = await livresModel.update( id, req.body);
 
     if ( !misAJour) 
-        throw new ApiError(404, `Livre id:${req.params.id} non trouvé`);
+        throw new NotFoundError(`Livre id:${req.params.id} non trouvé`);
 
     res.json( misAJour);
 };
@@ -111,13 +112,13 @@ export const deleteLivre = async (
     res: Response) : Promise<void> => 
 {
     const id: number = Number(req.params.id)
-    if (isNaN(id))
-        throw ApiError.badRequest('Id invalide');
-
+    if ( isNaN(id)) 
+        throw new BadRequestError('Id invalide');
+    
     const supprimé: boolean = await livresModel.remove( id);
 
     if ( !supprimé) 
-        throw new ApiError(404, `Livre id:${req.params.id} non trouvé`);
+        throw new NotFoundError( `Livre id:${req.params.id} non trouvé`);
 
     // 204 No Content — succès sans corps de réponse
     res.status(204).send();
