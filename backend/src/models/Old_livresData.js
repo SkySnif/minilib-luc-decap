@@ -56,8 +56,7 @@ const findAll = (filtres = {}) => {
     const { genre, disponible, recherche } = filtres;
     return livres.filter(livre => {
         if (genre !== undefined && livre.genre !== genre) return false;
-        if (disponible !== undefined && livre.disponible !== (disponible ===
-            'true')) return false;
+        if (disponible !== undefined && livre.disponible !== (disponible === true)) return false;
         if (recherche) {
             const t = recherche.toLowerCase();
             if (!livre.titre.toLowerCase().includes(t) &&

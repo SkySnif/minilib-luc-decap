@@ -45,10 +45,17 @@ export const findAll = async ( filtres: FiltresLivre = {}) : Promise<Livre[]> =>
         idx++;
     }
 
+    // TODO : Remove WHERE and just concat AND * - and add 1=1 in WHERE clause in SQL statement
     const where: string = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     
     const result: QueryResult<Livre> = await pool.query<Livre>(
-        `SELECT * FROM livres ${where} ORDER BY titre`,
+        `SELECT 
+            * 
+        FROM 
+            livres 
+        ${where} 
+        ORDER BY 
+            titre`,
         valeurs
     )
 
@@ -64,8 +71,14 @@ export const findAll = async ( filtres: FiltresLivre = {}) : Promise<Livre[]> =>
 export const findById = async (id: number) : Promise<Livre|null> => 
 {
     const result: QueryResult<Livre> = await pool.query<Livre>(
-        'SELECT * FROM livres WHERE id = $1', 
-        [id]);
+        `SELECT 
+            * 
+        FROM 
+            livres
+        WHERE 
+            id = $1`, 
+        [id]
+    );
 
     return result.rows[0] || null;
 };
@@ -80,23 +93,25 @@ export const create = async ( data: CreateLivreDto): Promise<Livre> =>
 {
 
     // Retrieve the list of the CreateLivreDto's fields 
-    const entries = Object.entries(data).filter(
+    const entries:[keyof CreateLivreDto, string | number | boolean][] = Object.entries(data).filter(
         ([, v]) => v !== undefined
     ) as [keyof CreateLivreDto, string | number | boolean][];
 
     const champs: (string | number | boolean )[] = entries.map(([k]) => k);
     const valeurs:(string | number | boolean )[] = entries.map(([, v]) => v);
 
-
     // Build values string for SQL
     const SQLqueryvalue: string = champs.map((_, i) => `$${i + 1}`).join(', ');
     const SQLField: string = champs.join(', ');
 
     const result: QueryResult<Livre> = await pool.query<Livre>( 
-        `INSERT INTO livres (${SQLField})
-            VALUES (${SQLqueryvalue})
-            RETURNING *`,
-            valeurs
+        `INSERT INTO 
+            livres (${SQLField})
+        VALUES 
+            ( ${SQLqueryvalue} )
+        RETURNING 
+            *`,
+        [valeurs]
     );
 
     return result.rows[0];
@@ -123,8 +138,14 @@ export const update = async (
     const setClause: string = champs.map((c, i) => `${c} = $${i + 1}`).join(', ');
 
     const result: QueryResult<Livre> = await pool.query<Livre>(
-        `UPDATE livres SET ${setClause} WHERE id = $${champs.length + 1} 
-            RETURNING *`,
+        `UPDATE 
+            livres 
+        SET 
+            ${setClause} 
+        WHERE 
+            id = $${champs.length + 1} 
+        RETURNING 
+            *`,
         [...valeurs, id]
     );
 
@@ -140,7 +161,12 @@ export const update = async (
 export const remove = async (id: number): Promise<boolean> => 
 {
     const result: QueryResult<Livre> = await pool.query<Livre>(
-        'DELETE FROM livres WHERE id = $1 RETURNING id', 
+        `DELETE FROM 
+            livres 
+        WHERE 
+            id = $1 
+        RETURNING 
+            id`, 
         [id]
     );
 

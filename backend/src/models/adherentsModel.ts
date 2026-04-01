@@ -33,7 +33,15 @@ const genererNumeroAdherent = async (): Promise<string> =>
 export const findAll = async ()  : Promise<Adherent[]> => 
 {
     const result: QueryResult<Adherent> = await pool.query<Adherent>( 
-        'SELECT * FROM adherents WHERE actif = true ORDER BY nom, prenom'
+        `SELECT 
+            * 
+        FROM 
+            adherents 
+        WHERE 
+            actif = true 
+        ORDER BY 
+            nom,
+            prenom`
     );
 
     return result.rows;
@@ -43,7 +51,12 @@ export const findAll = async ()  : Promise<Adherent[]> =>
 export const findById = async ( id: number) => 
 {
     const result: QueryResult<Adherent> = await pool.query<Adherent>( 
-        'SELECT * FROM adherents WHERE id = $1', 
+        `SELECT 
+            * 
+        FROM 
+            adherents 
+        WHERE 
+            id = $1`, 
         [id]
     );
 
@@ -58,12 +71,34 @@ export const findById = async ( id: number) =>
 */
 export const create = async (data: CreateAdherentDto): Promise<Adherent> => 
 {
-    const numero = await genererNumeroAdherent();
+    const numero: string = await genererNumeroAdherent();
+
+    // Retrieve the list of the CreateLivreDto's fields 
+    // TODO: Check details of this instruction
+    const entries:[keyof CreateAdherentDto, string | number | boolean][] = Object.entries(data).filter(
+        ([, v]) => v !== undefined
+        ) as [keyof CreateAdherentDto, string | number | boolean][];
+
+    const champs: (string | number | boolean )[] = entries.map(([k]) => k);
+    const valeurs:(string | number | boolean )[] = entries.map(([, v]) => v);
+
+    // Add numero_adherent in insert at the beginning of champs/valeur tab
+    champs.unshift('numero_adherent');
+    valeurs.unshift( numero);
+
+    // Build values string for SQL
+    const SQLqueryvalue: string = champs.map((_, i) => `$${i + 1}`).join(', ');
+    const SQLField: string = champs.join(', ');
 
     const result: QueryResult<Adherent> = await pool.query<Adherent>( 
-        `INSERT INTO adherents (numero_adherent, nom, prenom, email) VALUES ($1, $2, $3, $4) 
-            RETURNING *`,
-        [numero, nom, prenom, email]
+        `INSERT INTO 
+            adherents 
+                (${SQLField}) 
+        VALUES 
+            (${SQLField}) 
+        RETURNING 
+            *`,
+        valeurs
     );
 
     return result.rows[0];
@@ -75,10 +110,17 @@ export const create = async (data: CreateAdherentDto): Promise<Adherent> =>
 * @param {number} id
 * @returns {Promise<Object|null>} Adhérent mis à jour
 */
-export const desactiver = async (id) => 
+export const desactiver = async (id: number) : Promise<Adherent> => 
 {
-    const result = await pool.query(
-        'UPDATE adherents SET actif = false WHERE id = $1 RETURNING *',
+    const result: QueryResult<Adherent> = await pool.query<Adherent>( 
+        `UPDATE 
+            adherents 
+        SET
+            actif = false 
+        WHERE 
+            id = $1 
+        RETURNING 
+            *`, 
         [id]
     );
 

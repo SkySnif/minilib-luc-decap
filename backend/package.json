@@ -6,8 +6,8 @@
   "private": true,
   "main": "src/app.js",
   "scripts": {
-    "start": "node --env-file=.env src/app.js",
-    "dev": "node --watch --env-file=.env src/app.js",
+    "start": "tsx --env-file=.env src/app.ts",
+    "dev": "tsx --watch --env-file=.env src/app.ts",
     "test": "echo \"Tests à venir\""
   },
   "dependencies": {
@@ -21,6 +21,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.0",
     "@types/pg": "^8.20.0",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   }
 }

@@ -7,6 +7,7 @@ import { Adherent, CreateAdherentDto } from '../types/adherent.js';
 import * as adherentsModel from '../models/adherentsModel.js';
 
 /** GET /api/v1/adherents */
+//TODO : Add FilterDto and logic
 export const getAdherents = async ( 
     req: Request<{}, Adherent[], {}, {}>,
     res: Response) : Promise<void> => 
@@ -54,16 +55,18 @@ export const createAdherent = async (
 };
 
 /** DELETE /api/v1/adherents/:id — soft delete */
-export const desactiverAdherent = async ( req, res) => 
+export const desactiverAdherent = async ( 
+    req: Request<{id: string}, Adherent, {}, {}>,
+    res: Response) : Promise<void> => 
 {
-    const adherent = await adherentsModel.desactiver( req.params.id);
+   const id: number = Number(req.params.id)
+    if (isNaN(id))
+        throw ApiError.badRequest('Id invalide');
+
+    const adherent: Adherent = await adherentsModel.desactiver( id);
 
     if ( !adherent)
-        return res.status(404).json(
-            { 
-                erreur: `Adhérent id:${req.params.id} introuvable` 
-            }
-        );
+        throw new ApiError(404, 'Adhérent id:${req.params.id} introuvable');
 
     res.json( adherent);
 };
