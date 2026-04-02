@@ -1,5 +1,5 @@
 info:
-  name: livre 99
+  name: 60_livre_99
   type: http
   seq: 6
 
@@ -16,14 +16,13 @@ runtime:
     - type: tests
       code: |-
         test("should return 404", function () {
-          expect(res.getStatus()).to.equal(404 );
+          expect(res.getStatus()).to.equal(404);
         });
-             
 
         test("should return livre 99 not found", function () {
           const body = res.getBody();
           
-          expect(body.erreur).to.equal("Livre id:99 non trouvé");
+          expect(body.message).to.equal("Livre id:99 not found");
         });
 
 settings:

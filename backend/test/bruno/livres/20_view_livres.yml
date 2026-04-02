@@ -1,11 +1,11 @@
 info:
-  name: view_adherents
+  name: 20_view_livres
   type: http
   seq: 2
 
 http:
   method: GET
-  url: http://{{BRUNO_TEST_URL}}:{{BRUNO_TEST_PORT}}/api/v1/adherents
+  url: http://{{BRUNO_TEST_URL}}:{{BRUNO_TEST_PORT}}/api/v1/livres
   auth: inherit
 
 runtime:
@@ -16,13 +16,14 @@ runtime:
           expect(res.getStatus()).to.equal(200);
         });
 
-        test("should return array of adherents", function () {
-          const adherents = res.getBody();
-          expect(adherents).to.be.an("array");
+        test("should return array of livres", function () {
+          const livres = res.getBody();
+          
+          expect(livres).to.be.an("array");
           
           //expect(users).to.have.lengthOf(3);
           
-           expect(adherents[0]).to.have.property("id");
+           expect(livres[0]).to.have.property("id");
         });
 
 settings:

@@ -1,5 +1,5 @@
 info:
-  name: new livre sans titre
+  name: 80_new_livre_sans_titre
   type: http
   seq: 8
 
@@ -27,11 +27,14 @@ runtime:
              
         test("sould return champs manquants", function () {
           const body = res.getBody();
-
-          expect(body.erreur).to.equal("Champs obligatoires manquants");
-          expect(body.champs).to.include("titre")
-          expect(body.champs[0]).to.equal("titre");
           
+          expect(body.status).to.equal("error");
+          expect(body.message).to.equal("Validation failed");
+          
+          const champsManquant=body.details[0].path;
+          expect(champsManquant).to.be.an("array");
+          expect(champsManquant[0]).to.equal("titre")
+
         });
 
 settings:
