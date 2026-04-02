@@ -9,7 +9,7 @@
 */
 
 import pool from '../config/database.js';
-import { QueryResult } from '../types/queryResult.js';
+import type { QueryResult } from '../types/queryResult.js';
 
 // Manage to converte error code by DB in global error code
 import { mapDBError } from "../utils/errors/db/dbErrorMapper.js";
@@ -18,7 +18,7 @@ import { mapDBError } from "../utils/errors/db/dbErrorMapper.js";
 import { DuplicateLivreError  } from "../utils/errors/modulesErrors/livresErrors.js";
 
 // import { Livre, FiltresLivre, CreateLivreDto } from '../types/livre.js';
-import { Livre, FiltresLivre, CreateLivreDto } from "../validators/livreSchema.js";
+import type { Livre, FiltresLivre, CreateLivreDto } from "../validators/livreSchema.js";
 
 /**
 * Récupère tous les livres avec filtres optionnels.

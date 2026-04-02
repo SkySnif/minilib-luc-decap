@@ -4,7 +4,7 @@
 * @module adherentsModel
 */
 import pool from '../config/database.js';
-import { QueryResult, CountRow} from '../types/queryResult.js';
+import type { QueryResult, CountRow} from '../types/queryResult.js';
 import { mapDBError } from "../utils/errors/db/dbErrorMapper.js";
 import { prepareInsert } from '../utils/helpers/dbhelper.js';
 

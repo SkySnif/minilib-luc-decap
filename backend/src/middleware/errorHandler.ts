@@ -1,6 +1,6 @@
 // backend/src/middleware/errorHandler.ts
 
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { ApiError } from "../utils/errors/ApiError.js";
 
 const errorHandler = (

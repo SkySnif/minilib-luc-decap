@@ -7,7 +7,7 @@ export const createAdherentSchema = z.object(
     {
         nom: z.string().min(1).describe("Nom de l'adherent"),
         prenom: z.string().min(1).describe("Prénom de l'adherent"),
-        email: z.string().email().describe("Adresse email"),
+        email: z.email().describe("Adresse email"),
     }
 );
 
@@ -20,7 +20,7 @@ export const adherentResponseSchema = z.object(
         numero_adherent: z.string().describe("Numéro adhérent unique"),
         nom: z.string().describe("Nom de l'adherent"),
         prenom: z.string().describe("Prénom de l'adherent"),
-        email: z.string().email().describe("Adresse email"),
+        email: z.email().describe("Adresse email"),
         actif: z.boolean().describe("Statut actif"),
         created_at: z.date().describe("Date de création"),
     }

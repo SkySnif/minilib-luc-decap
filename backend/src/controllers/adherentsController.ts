@@ -1,10 +1,10 @@
 // backend/src/controllers/adherentsController.js
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 import { BadRequestError, NotFoundError } from "../utils/errors/index.js";
 
 //import { Adherent, CreateAdherentDto } from '../types/adherent.js';
-import { Adherent, CreateAdherentDto } from '../validators/adherentSchema.js';
+import type { Adherent, CreateAdherentDto } from '../validators/adherentSchema.js';
 
 import * as adherentsModel from '../models/adherentsModel.js';
 

@@ -5,7 +5,7 @@
 */
 
 import pool from '../config/database.js';
-import { QueryResult } from '../types/queryResult.js';
+import type { QueryResult } from '../types/queryResult.js';
 
 // Manage to converte error code by DB in global error code
 import { mapDBError } from "../utils/errors/db/dbErrorMapper.js";
@@ -14,7 +14,7 @@ import { mapDBError } from "../utils/errors/db/dbErrorMapper.js";
 import { DuplicateEmpruntsError  } from "../utils/errors/modulesErrors/EmpruntsErrors.js";
 
 // import { Livre, FiltresLivre, CreateLivreDto } from '../types/livre.js';
-import { Emprunt  } from "../validators/empruntShema.js";
+import type { Emprunt  } from "../validators/empruntShema.js";
 
 // ───────────────────────────────────────────────────────────────
 // ──── Export function ─ exposed to route ───────────────────────

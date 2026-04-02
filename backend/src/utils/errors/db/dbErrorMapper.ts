@@ -1,6 +1,6 @@
 // src/utils/errors/dbErrorMapper.ts
 
-import { DBErrorType } from "./dbErrorTypes.js";
+import type { DBErrorType } from "./dbErrorTypes.js";
 
 export function mapDBError(err: any): DBErrorType {
     // PostgreSQL
