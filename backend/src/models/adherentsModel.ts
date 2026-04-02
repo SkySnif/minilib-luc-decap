@@ -11,7 +11,8 @@ import { prepareInsert } from '../utils/helpers/dbhelper.js';
 // Error manager for specific error to catch associated to livres
 import { DuplicateAdherentsError } from "../utils/errors/modulesErrors/adherentsErrors.js";
 
-import { Adherent, CreateAdherentDto, createAdherentSchema } from '../validators/adherentSchema.js';
+import { createAdherentSchema } from '../validators/adherentSchema.js';
+import type { Adherent, CreateAdherentDto } from '../validators/adherentSchema.js';
 
 // ───────────────────────────────────────────────────────────────
 // ──── Private function ─ not exposed to route ───────────────────────
