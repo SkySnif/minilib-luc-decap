@@ -1,12 +1,12 @@
 // ─── backend/src/controllers/livresController.js ──────────────────────
 // Controller pour les livres — logique métier entre les routes et les données
 
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 import { BadRequestError, NotFoundError } from "../utils/errors/index.js";
 
 // import { Livre, FiltresLivre, CreateLivreDto } from '../types/livre.js';
-import {  Livre, FiltresLivre, CreateLivreDto } from "../validators/livreSchema.js";
+import type {  Livre, FiltresLivre, CreateLivreDto } from "../validators/livreSchema.js";
 import * as livresModel from '../models/livresModel.js';
 
 /**

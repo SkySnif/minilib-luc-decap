@@ -2,7 +2,8 @@
 // Entry Point of MiniLib Express server
 // Start with : npm run dev
 
-import express, { Request, Response, NextFunction, Application} from 'express';
+import express from 'express';
+import type { Request, Response, NextFunction, Application} from 'express';
 
 //import express from 'express';
 import cors from 'cors';
@@ -10,7 +11,6 @@ import cors from 'cors';
 
 // Error handler
 import errorHandler from "./middleware/errorHandler.js";
-
 
 // Router Import
 import livresRouter from './routes/livres.js';

@@ -23,11 +23,19 @@ export const getAdherents = async (
     res.json( adherents);
 };
 
-/** GET /api/v1/adherents/:id */
+/**
+ * GET /api/v1/adherents/:id
+ * Get Adherent by id
+ *
+ * @async
+ * @param {Request<{id: string}, Adherent, {}, {}>} req 
+ * @param {Response} res 
+ * @returns {Promise<void>} 
+ */
 export const getAdherentById = async ( 
     req: Request<{id: string}, Adherent, {}, {}>,
     res: Response) : Promise<void> => 
-{
+{   
    const id: number = Number(req.params.id)
     if (isNaN(id))
         throw new BadRequestError( 'Id invalide');

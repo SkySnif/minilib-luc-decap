@@ -1,11 +1,11 @@
-// frontend/src/App.tsx
+// frontend/src/App.tsx — version finale du jour
 import "./index.css";
+import LivresPage from "./pages/LivresPage";
 
 function App() {
   return (
-    <div>
-      <h1>MiniLib</h1>
-      <p>Application de gestion de bibliothèque</p>
+    <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+      <LivresPage />
     </div>
   );
 }
